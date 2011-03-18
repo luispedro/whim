@@ -10,3 +10,4 @@ oa = new OAuth(
             "PLAINTEXT")
 @request_token = (cb) -> oa.getOAuthRequestToken cb
 @access_token = (ot, ots, v, cb) -> oa.getOAuthAccessToken ot, ots, v, cb
+@get_protected = (u, meth, ot, ots, cb) -> oa.getProtectedResource u, meth, ot, ots, cb

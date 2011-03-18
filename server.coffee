@@ -1,6 +1,7 @@
 express = require('express')
 sys = require('sys')
 oauth = require('./login')
+_ = require('underscore')
 
 app = express.createServer()
 app.use express.bodyParser()
@@ -19,21 +20,29 @@ app.get '/user', (req, res) ->
 app.get '/userlogin/:verifier', (req, res) ->
     verifier = req.params.verifier
 
-    console.log 'token:' + req.session.oauth.token
-    console.log 'secret:' + req.session.oauth.token_secret
-    console.log 'verifier:' + verifier
-    console.log 'typeof verifier:' + typeof verifier
-    oauth.access_token(req.session.oauth.token, req.session.oauth.token_secret, verifier, (error, oauth_access_token, oauth_access_token_secret, results) ->
+    oauth.access_token req.session.oauth.token, \
+                        req.session.oauth.token_secret, \
+                        verifier, \
+                        (error, oauth_access_token, oauth_access_token_secret, results) ->
         if error
             console.log 'oauth access_token error: ' + sys.inspect(error)
         else
-            req.oauth.access_token = oauth_access_token
-            req.oauth.access_token_secret = oauth_access_token_secret
+            req.session.oauth.access_token = oauth_access_token
+            req.session.oauth.access_token_secret = oauth_access_token_secret
             res.redirect '/library'
-    )
 
 app.get '/library', (req, res) ->
-    res.end 'Your library'
+    oauth.get_protected 'http://www.mendeley.com/oapi/library/', \
+                        'get', \
+                        req.session.oauth.access_token, \
+                        req.session.oauth.access_token_secret, \
+                        (error, data, response) ->
+        data = JSON.parse(data)
+        res.write 'Library\n<ul>'
+        _.each data.document_ids, (d) ->
+            res.write '<li>' + d + '</li>'
+        res.write '</ul>'
+        res.end
 
 app.listen(20008)
 console.log 'WTR server started on port %s', app.address().port
