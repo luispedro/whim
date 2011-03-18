@@ -9,4 +9,4 @@ oa = new OAuth(
             'oob',
             "PLAINTEXT")
 @request_token = (cb) -> oa.getOAuthRequestToken cb
-@access_token = (ot, ots, cb) -> oa.getOAuthAccessToken ot, ots, cb
+@access_token = (ot, ots, v, cb) -> oa.getOAuthAccessToken ot, ots, v, cb
