@@ -11,6 +11,10 @@ app.use express.methodOverride()
 app.use express.cookieParser()
 app.use express.session({ secret : 'the mouse ran up the clock', store : new redis_store() })
 
+app.register '.coffee', require('coffeekup')
+app.set 'view engine', 'coffee'
+app.set 'view options', { layout : false }
+
 app.get '/user', (req, res) ->
     oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
         if error
@@ -40,11 +44,7 @@ app.get '/library', (req, res) ->
                         req.session.oauth.access_token_secret, \
                         (error, data, response) ->
         data = JSON.parse(data)
-        res.write 'Library\n<ul>'
-        _.each data.document_ids, (d) ->
-            res.write '<li>' + d + '</li>'
-        res.write '</ul>'
-        res.end
+        res.render 'library', context: { library : data.document_ids }
 
 app.listen(20008)
 console.log 'WTR server started on port %s', app.address().port
