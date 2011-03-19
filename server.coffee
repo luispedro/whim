@@ -1,13 +1,15 @@
 express = require('express')
 sys = require('sys')
 oauth = require('./login')
+mongodb = require('mongodb')
+redis_store = require('connect-redis')
 _ = require('underscore')
 
 app = express.createServer()
 app.use express.bodyParser()
 app.use express.methodOverride()
 app.use express.cookieParser()
-app.use express.session({ secret : 'the mouse ran up the clock' })
+app.use express.session({ secret : 'the mouse ran up the clock', store : new redis_store() })
 
 app.get '/user', (req, res) ->
     oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
