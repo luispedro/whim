@@ -13,7 +13,6 @@ app.use express.session({ secret : 'the mouse ran up the clock', store : new red
 
 app.register '.coffee', require('coffeekup')
 app.set 'view engine', 'coffee'
-app.set 'view options', { layout : false }
 
 app.get '/user', (req, res) ->
     oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
