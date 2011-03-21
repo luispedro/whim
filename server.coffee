@@ -1,9 +1,10 @@
 express = require('express')
 sys = require('sys')
-oauth = require('./login')
 mongodb = require('mongodb')
 redis_store = require('connect-redis')
 _ = require('underscore')
+
+oauth = require('./login')
 
 app = express.createServer()
 app.use express.bodyParser()
@@ -42,9 +43,23 @@ app.get '/library', (req, res) ->
                         req.session.oauth.access_token, \
                         req.session.oauth.access_token_secret, \
                         (error, data, response) ->
-        data = JSON.parse(data)
-        res.render 'library', context: { library : data.document_ids }
-
+        libdata = JSON.parse(data)
+        detailed = []
+        _.each libdata.document_ids, (id) ->
+            url = 'http://www.mendeley.com/oapi/library/documents/' + id + '/'
+            oauth.get_protected url, \
+                                'get', \
+                                req.session.oauth.access_token, \
+                                req.session.oauth.access_token_secret, \
+                                (error, data, response) ->
+                if error
+                    console.log error
+                else
+                    details = JSON.parse(data)
+                    console.log details
+                    detailed.push(details.title)
+                    if detailed.length == libdata.document_ids.length
+                        res.render 'library', context: { library : detailed }
 app.listen(20008)
 console.log 'WTR server started on port %s', app.address().port
 
