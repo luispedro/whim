@@ -39,7 +39,6 @@ app.get '/userlogin/:verifier', (req, res) ->
 
 app.get '/library', (req, res) ->
     oauth.get_protected 'http://www.mendeley.com/oapi/library/', \
-                        'get', \
                         req.session.oauth.access_token, \
                         req.session.oauth.access_token_secret, \
                         (error, data, response) ->
@@ -48,18 +47,36 @@ app.get '/library', (req, res) ->
         _.each libdata.document_ids, (id) ->
             url = 'http://www.mendeley.com/oapi/library/documents/' + id + '/'
             oauth.get_protected url, \
-                                'get', \
                                 req.session.oauth.access_token, \
                                 req.session.oauth.access_token_secret, \
                                 (error, data, response) ->
+
                 if error
                     console.log error
                 else
                     details = JSON.parse(data)
-                    console.log details
-                    detailed.push(details.title)
-                    if detailed.length == libdata.document_ids.length
-                        res.render 'library', context: { library : detailed }
+                    if details.identifiers.doi?
+                        doi = details.identifiers.doi
+                        doi = doi.replace('/', '%252F')
+                        url = 'http://www.mendeley.com/oapi/documents/details/' + doi + '?type=doi'
+                        oauth.get_protected url, \
+                                null, \
+                                null, \
+                                (error, data, response) ->
+                            if error
+                                if error.statusCode == 404
+                                    detailed.push(details.title)
+                                else
+                                    console.log('error:' + sys.inspect(error))
+                            else
+                               docdata = JSON.parse(data)
+                               detailed.push(details.title + " (" + docdata.uuid + ")")
+                            if detailed.length == libdata.document_ids.length
+                                res.render 'library', context: { library : detailed }
+                    else
+                        detailed.push(details.title)
+                        if detailed.length == libdata.document_ids.length
+                            res.render 'library', context: { library : detailed }
 app.listen(20008)
 console.log 'WTR server started on port %s', app.address().port
 
