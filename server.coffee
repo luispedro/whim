@@ -1,10 +1,10 @@
 express = require('express')
 sys = require('sys')
-mongodb = require('mongodb')
 redis_store = require('connect-redis')
 _ = require('underscore')
 
 oauth = require('./login')
+models = require('./models')
 
 app = express.createServer()
 app.use express.bodyParser()
@@ -14,6 +14,9 @@ app.use express.session({ secret : 'the mouse ran up the clock', store : new red
 
 app.register '.coffee', require('coffeekup')
 app.set 'view engine', 'coffee'
+
+app.get '/', (req, res) ->
+    res.redirect '/user'
 
 app.get '/user', (req, res) ->
     res.render 'userlogin'
@@ -49,6 +52,14 @@ app.get '/library', (req, res) ->
                         (error, data, response) ->
         libdata = JSON.parse(data)
         detailed = []
+        library = new models.Library()
+        library.username = req.session.username
+        library.documents = []
+        maybe_done = ->
+            if detailed.length == libdata.document_ids.length
+                res.render 'library', context: { library : detailed }
+                library.save (err) ->
+                    console.log "Error in mongoose: "+err
         _.each libdata.document_ids, (id) ->
             url = 'http://www.mendeley.com/oapi/library/documents/' + id + '/'
             oauth.get_protected url, \
@@ -74,14 +85,13 @@ app.get '/library', (req, res) ->
                                 else
                                     console.log('error:' + sys.inspect(error))
                             else
-                               docdata = JSON.parse(data)
-                               detailed.push(details.title + " (" + docdata.uuid + ")")
-                            if detailed.length == libdata.document_ids.length
-                                res.render 'library', context: { library : detailed }
+                                docdata = JSON.parse(data)
+                                detailed.push(details.title + " (" + docdata.uuid + ")")
+                                library.documents.push { doi : doi, title : details.title, uuid : docdata.uuid }
+                            maybe_done()
                     else
                         detailed.push(details.title)
-                        if detailed.length == libdata.document_ids.length
-                            res.render 'library', context: { library : detailed }
+                    maybe_done()
 app.listen(20008)
 console.log 'WTR server started on port %s', app.address().port
 
