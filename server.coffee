@@ -5,6 +5,7 @@ _ = require('underscore')
 
 oauth = require('./login')
 models = require('./models')
+related = require('./related').related
 
 app = express.createServer()
 app.use express.bodyParser()
@@ -92,6 +93,9 @@ app.get '/library', (req, res) ->
                     else
                         detailed.push(details.title)
                     maybe_done()
+
+app.get '/related', related
+
 app.listen(20008)
 console.log 'WTR server started on port %s', app.address().port
 
