@@ -82,16 +82,16 @@ app.get '/library', (req, res) ->
                                 (error, data, response) ->
                             if error
                                 if error.statusCode == 404
-                                    detailed.push(details.title)
+                                    detailed.push { title : details.title }
                                 else
                                     console.log('error:' + sys.inspect(error))
                             else
                                 docdata = JSON.parse(data)
-                                detailed.push(details.title + " (" + docdata.uuid + ")")
+                                detailed.push {title: details.title, uuid: docdata.uuid }
                                 library.documents.push { doi : doi, title : details.title, uuid : docdata.uuid }
                             maybe_done()
                     else
-                        detailed.push(details.title)
+                        detailed.push { title: details.title }
                     maybe_done()
 
 app.get '/related', related
