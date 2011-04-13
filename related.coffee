@@ -4,7 +4,7 @@ oauth = require('./login')
 models = require('./models')
 
 retrieve_related = (uuid, cb) ->
-    console.log "will query mongodb"
+    console.log "[related] will query mongodb"
     models.Related.findOne { base: uuid }, (err, docs) ->
         if err or docs is null
             console.log "querying mendeley"
@@ -18,7 +18,7 @@ retrieve_related = (uuid, cb) ->
                         cb error, null
                     else
                         details = JSON.parse(data)
-                        console.log "retrieved from mendeley"
+                        console.log "[related] retrieved from mendeley"
                         cb null, details.documents
                         related = new models.Related
                         related.base = uuid
@@ -26,7 +26,7 @@ retrieve_related = (uuid, cb) ->
                         _.each details.document, (r) -> related.related.push r.uuid
                         related.save()
         else
-            console.log "lookup on mongodb"
+            console.log "[related] lookup on mongodb"
             documents = _.map docs.related, (d) -> { title: d }
             cb null, documents
 
