@@ -1,4 +1,5 @@
 async = require('async')
+_ = require('underscore')
 
 oauth = require('./login')
 models = require('./models')
@@ -37,7 +38,7 @@ retrieve_doi_information = (doi, title, cb) ->
             cb null, doc
 
 @handle_library = (req, res) ->
-    oauth.get_protected 'http://www.mendeley.com/oapi/library/', \
+    oauth.get_protected 'http://www.mendeley.com/oapi/library/?items=1000', \
                         req.session.oauth.access_token, \
                         req.session.oauth.access_token_secret, \
                         (error, data, response) ->
@@ -62,7 +63,12 @@ retrieve_doi_information = (doi, title, cb) ->
                     else
                         cb null, { title: details.title }
         async.map libdata.document_ids, id_to_doc, (err, docs) ->
-            res.render 'library', context: { library: docs }
+            counter = (acc, doc) ->
+                if doc.uuid?
+                    return acc
+                return acc + 1
+            nr_uuids = _.reduce docs, counter, 0
+            res.render 'library', context: { library: docs, nr_uuids: nr_uuids }
             library.documents = docs
             library.save (err) ->
                 if err

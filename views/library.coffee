@@ -1,4 +1,5 @@
 h1 'Your Library'
+p 'Found '+@nr_uuids+' usable documents'
 ul ->
     for doc in @library
         li ->
