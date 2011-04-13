@@ -10,16 +10,17 @@ retrieve_doi_information_mendeley = (doi, title, cb) ->
             null, \
             null, \
             (error, data, response) ->
-                if error
-                    if error.statusCode == 404
-                        cb null, { title: title }
-                    else
+                if error and error.statusCode != 404
                         cb error, null
                 else
-                    docdata = JSON.parse(data)
-                    doc = { doi: doi, title: docdata.title, uuid: docdata.uuid }
+                    if error and error.statusCode == 404
+                        uuid = null
+                    else
+                        docdata = JSON.parse(data)
+                        title = docdata.title
+                        uuid = docdata.uuid
+                    doc = new models.Document({ doi: doi, title: title, uuid: uuid })
                     cb null, doc
-                    doc = new models.Document(doc)
                     doc.save (err) ->
                         if err
                             console.log "Error in mongoose (saving document): "+err
@@ -62,6 +63,7 @@ retrieve_doi_information = (doi, title, cb) ->
                         cb null, { title: details.title }
         async.map libdata.document_ids, id_to_doc, (err, docs) ->
             res.render 'library', context: { library: docs }
+            library.documents = docs
             library.save (err) ->
                 if err
                     console.log "Error in mongoose (saving library): "+err

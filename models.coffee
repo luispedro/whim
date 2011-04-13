@@ -1,5 +1,5 @@
 mongoose = require('mongoose')
-mongoose.connect 'mongodb://localhost/home/luispedro/work/whim/data' 
+mongoose.connect 'mongodb://localhost/home/luispedro/work/whim/data'
 Schema = mongoose.Schema
 ObjectId = Schema.ObjectId
 
@@ -11,7 +11,7 @@ Document = new Schema(
 
 Library = new Schema(
             { username : String
-            , documents : [Document]
+            , documents : [ObjectId]
             })
 Related = new Schema(
             { base : { type: String, index: true }
