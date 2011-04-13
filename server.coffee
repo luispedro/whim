@@ -6,6 +6,7 @@ _ = require('underscore')
 oauth = require('./login')
 models = require('./models')
 related = require('./related').related
+handle_library = require('./library').handle_library
 
 app = express.createServer()
 app.use express.bodyParser()
@@ -46,53 +47,7 @@ app.get '/userlogin/', (req, res) ->
             req.session.oauth.access_token_secret = oauth_access_token_secret
             res.redirect '/library'
 
-app.get '/library', (req, res) ->
-    oauth.get_protected 'http://www.mendeley.com/oapi/library/', \
-                        req.session.oauth.access_token, \
-                        req.session.oauth.access_token_secret, \
-                        (error, data, response) ->
-        libdata = JSON.parse(data)
-        detailed = []
-        library = new models.Library()
-        library.username = req.session.username
-        library.documents = []
-        maybe_done = ->
-            if detailed.length == libdata.document_ids.length
-                res.render 'library', context: { library : detailed }
-                library.save (err) ->
-                    console.log "Error in mongoose: "+err
-        _.each libdata.document_ids, (id) ->
-            url = 'http://www.mendeley.com/oapi/library/documents/' + id + '/'
-            oauth.get_protected url, \
-                                req.session.oauth.access_token, \
-                                req.session.oauth.access_token_secret, \
-                                (error, data, response) ->
-
-                if error
-                    console.log error
-                else
-                    details = JSON.parse(data)
-                    if details.identifiers.doi?
-                        doi = details.identifiers.doi
-                        doi = doi.replace('/', '%252F')
-                        url = 'http://www.mendeley.com/oapi/documents/details/' + doi + '?type=doi'
-                        oauth.get_protected url, \
-                                null, \
-                                null, \
-                                (error, data, response) ->
-                            if error
-                                if error.statusCode == 404
-                                    detailed.push { title : details.title }
-                                else
-                                    console.log('error:' + sys.inspect(error))
-                            else
-                                docdata = JSON.parse(data)
-                                detailed.push {title: details.title, uuid: docdata.uuid }
-                                library.documents.push { doi : doi, title : details.title, uuid : docdata.uuid }
-                            maybe_done()
-                    else
-                        detailed.push { title: details.title }
-                    maybe_done()
+app.get '/library', handle_library
 
 app.get '/related', related
 
