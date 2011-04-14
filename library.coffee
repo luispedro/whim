@@ -12,17 +12,25 @@ retrieve_doi_information_mendeley = (doi, title, cb) ->
             null, \
             null, \
             (error, data, response) ->
-                if error and error.statusCode != 404
+                if error
+                    response = error.statusCode
+                    uuid = null
+                    if not (response == 404 or response == 403)
                         cb error, null
+                        return
                 else
-                    if error and error.statusCode == 404
-                        uuid = null
-                    else
-                        docdata = JSON.parse(data)
-                        title = docdata.title
-                        uuid = docdata.uuid
-                    doc = new models.Document({ doi: doi, title: title, uuid: uuid })
-                    cb null, doc
+                    response = 200
+                    docdata = JSON.parse(data)
+                    title = docdata.title
+                    uuid = docdata.uuid
+                doc = new models.Document(
+                                { doi: doi
+                                , title: title
+                                , uuid: uuid
+                                , queried_at: new Date()
+                                , response: response
+                                })
+                cb null, doc
 
 retrieve_doi_information = (doi, title, cb) ->
     models.Document.findOne { doi: doi }, (err, doc) ->
@@ -78,7 +86,6 @@ retrieve_library_mendeley = (req, cb) ->
                     if err
                         console.log "Error in mongoose (saving docs): "+err
                     else
-                        console.log
                         library.documents = ids
                         library.save (err) ->
                             if err
@@ -96,7 +103,7 @@ retrieve_library = (req, cb) ->
                         cb err, null
                     else
                         if not doc?
-                            console.log "null return for "+id
+                            console.log "[mongoose doc lookup] null return for "+id
                         cb null, doc
             async.map library.documents, objectid_to_doc, cb
         else
