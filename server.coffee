@@ -2,6 +2,7 @@ express = require('express')
 sys = require('sys')
 redis_store = require('connect-redis')
 _ = require('underscore')
+stylus = require 'stylus'
 
 oauth = require('./login')
 models = require('./models')
@@ -9,13 +10,18 @@ related = require('./related').related
 handle_library = require('./library').handle_library
 
 app = express.createServer()
-app.use express.bodyParser()
-app.use express.methodOverride()
-app.use express.cookieParser()
-app.use express.session({ secret : 'the mouse ran up the clock', store : new redis_store() })
+app.configure ->
+    app.use express.bodyParser()
+    app.use express.methodOverride()
+    app.use express.cookieParser()
+    app.use express.session { secret: 'the mouse ran up the clock', store: new redis_store() }
 
-app.register '.coffee', require('coffeekup')
-app.set 'view engine', 'coffee'
+    app.register '.coffee', require('coffeekup')
+    app.set 'view engine', 'coffee'
+
+    app.use stylus.middleware({ src: __dirname + '/public' })
+    app.use app.router
+    app.use express.static(__dirname + '/public')
 
 app.get '/', (req, res) ->
     res.redirect '/user'
