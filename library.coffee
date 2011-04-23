@@ -91,7 +91,7 @@ retrieve_library_mendeley = (req, cb) ->
                             if err
                                 console.log "Error in mongoose (saving library): "+err
 
-retrieve_library = (req, cb) ->
+@retrieve_library = (req, cb) ->
     models.Library.findOne { username: req.session.username }, (err, library) ->
         if err
             cb err, null
