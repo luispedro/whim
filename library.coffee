@@ -110,7 +110,7 @@ retrieve_library_mendeley = (req, cb) ->
             retrieve_library_mendeley req, cb
 
 @handle_library = (req, res) ->
-    retrieve_library req, (err, documents) ->
+    exports.retrieve_library req, (err, documents) ->
         if err
             console.log '[retrieve library] error: '+sys.inspect(err)
         else

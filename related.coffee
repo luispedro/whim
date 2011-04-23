@@ -32,7 +32,7 @@ models = require('./models')
 
 @retrieve_related = (doc, cb) ->
     if doc.uuid?
-        retrieve_related_by_uuid doc.uuid, cb
+        exports.retrieve_related_by_uuid doc.uuid, cb
     else
         cb 'related.retrieve_related: uuid is needed', null
 
@@ -42,6 +42,6 @@ models = require('./models')
         res.render 'error', context: { msg : 'missing argument' }
         return
     console.log "will retrieve uuid"
-    retrieve_related_by_uuid uuid, (error, related) ->
+    exports.retrieve_related_by_uuid uuid, (error, related) ->
         res.render 'related', context: { title: "My title", related: related }
 
