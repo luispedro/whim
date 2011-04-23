@@ -29,6 +29,7 @@ app.get '/mendeleyauth', (req, res) ->
     oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
         if error
             console.log 'oauth request_token error: ' + sys.inspect(error)
+            res.render 'error', context: { error_message: ('Error '+error.statusCode+' in retrieving auth token.') }
         else
             req.session.oauth = { token : oauth_token, token_secret : oauth_token_secret }
             res.redirect 'http://www.mendeley.com/oauth/authorize/?oauth_token=' + oauth_token + '&oauth_callback=http:%2F%2F127.0.0.1:20008%2Fuserlogin%2F'
