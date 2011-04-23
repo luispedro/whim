@@ -110,6 +110,9 @@ retrieve_library_mendeley = (req, cb) ->
             retrieve_library_mendeley req, cb
 
 @handle_library = (req, res) ->
+    if not req.session.oauth
+        res.redirect '/user'
+        return
     exports.retrieve_library req, (err, documents) ->
         if err
             console.log '[retrieve library] error: '+sys.inspect(err)
