@@ -9,7 +9,7 @@ models = require('./models')
     models.Related.findOne { base: uuid }, (err, docs) ->
         if err or docs is null
             console.log "querying mendeley"
-            url = 'http://api.mendeley.com/oapi/documents/related/'+uuid+'/'
+            url = 'oapi/documents/related/'+uuid+'/'
             oauth.get_protected url, \
                 null, \
                 null, \

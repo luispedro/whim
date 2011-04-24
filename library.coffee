@@ -7,7 +7,7 @@ models = require('./models')
 
 
 retrieve_doi_information_mendeley = (doi, title, cb) ->
-    url = 'http://www.mendeley.com/oapi/documents/details/' + doi.replace('/', '%252F') + '?type=doi'
+    url = 'oapi/documents/details/' + doi.replace('/', '%252F') + '?type=doi'
     oauth.get_protected url, \
             null, \
             null, \
@@ -44,7 +44,7 @@ retrieve_doi_information = (doi, title, cb) ->
             cb null, doc
 
 retrieve_library_mendeley = (req, cb) ->
-    oauth.get_protected 'http://www.mendeley.com/oapi/library/?items=1000', \
+    oauth.get_protected 'oapi/library/?items=100', \
                         req.session.oauth.access_token, \
                         req.session.oauth.access_token_secret, \
                         (error, data, response) ->
@@ -53,7 +53,7 @@ retrieve_library_mendeley = (req, cb) ->
         library.username = req.session.username
 
         id_to_doc = (id, cb) ->
-            url = 'http://www.mendeley.com/oapi/library/documents/' + id + '/'
+            url = 'oapi/library/documents/' + id + '/'
             oauth.get_protected url, \
                                 req.session.oauth.access_token, \
                                 req.session.oauth.access_token_secret, \
