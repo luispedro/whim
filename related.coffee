@@ -1,4 +1,5 @@
 _ = require('underscore')
+async = require('async')
 
 oauth = require('./login')
 models = require('./models')
@@ -23,12 +24,12 @@ models = require('./models')
                         related = new models.Related()
                         related.base = uuid
                         related.related = []
-                        _.each details.document, (r) -> related.related.push r.uuid
+                        _.each details.documents, (r) -> related.related.push r.uuid
                         related.save()
         else
-            console.log "[related] lookup on mongodb"
-            documents = _.map docs.related, (d) -> { title: d }
-            cb null, documents
+            console.log "[related] lookup on mongodb (result: "+docs.base+" -> "+docs.related.length+")"
+            lookup_doc = (uuid, cb) -> models.Document.findOne { uuid: uuid }, cb
+            async.map docs.related, lookup_doc, cb
 
 @retrieve_related = (doc, cb) ->
     if doc.uuid?
