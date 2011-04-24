@@ -8,6 +8,7 @@ oauth = require('./login')
 models = require('./models')
 related = require('./related').related
 handle_library = require('./library').handle_library
+handle_recommended = require('./controllers/recommended').handle_recommended
 
 app = express.createServer()
 app.configure ->
@@ -56,8 +57,8 @@ app.get '/userlogin/', (req, res) ->
             res.redirect '/library'
 
 app.get '/library', handle_library
-
 app.get '/related', related
+app.get '/recommended', handle_recommended
 
 app.listen(20008)
 console.log 'WTR server started on port %s', app.address().port
