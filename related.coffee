@@ -1,5 +1,6 @@
 _ = require('underscore')
 async = require('async')
+sys = require('sys')
 
 oauth = require('./login')
 models = require('./models')
@@ -25,7 +26,25 @@ models = require('./models')
                         related.base = uuid
                         related.related = []
                         _.each details.documents, (r) -> related.related.push r.uuid
-                        related.save()
+                        related.save (err) ->
+                            if err
+                                console.log "[error saving related]: "+sys.inspect(err)
+                        save_doc = (document, cb) ->
+                            models.Document.findOne { uuid: document.uuid }, (err,doc) ->
+                                if err
+                                    cb err
+                                else if not doc?
+                                    doc = new models.Document(
+                                                    { doi: document.doi
+                                                    , title: document.title
+                                                    , uuid: document.uuid
+                                                    , queried_at: new Date()
+                                                    })
+                                    doc.save cb
+                        async.forEach details.documents, save_doc, (err) ->
+                            if err
+                                console.log "[error saving related documents]: "+sys.inspect(err)
+
         else
             console.log "[related] lookup on mongodb (result: "+docs.base+" -> "+docs.related.length+")"
             lookup_doc = (uuid, cb) -> models.Document.findOne { uuid: uuid }, cb
