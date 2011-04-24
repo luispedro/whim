@@ -27,5 +27,16 @@ retrieve_recommendations = (req, cb) ->
             res.render 'error', context: { error: sys.inspect(err) }
         else
             console.log '[retrieve recommendations] success ('+documents.length+' documents)'
-            res.render 'recommended', context: { documents: documents }
+            todisplay = {}
+            _.each documents, (doc) ->
+                if doc.uuid of todisplay
+                    ++todisplay[doc.uuid].hits
+                else
+                    todisplay[doc.uuid] =
+                        doc: doc
+                        hits: 1
+            todisplay = (todisplay[d] for d in Object.keys(todisplay))
+            todisplay.sort (d0, d1) ->
+                d1.hits - d0.hits
+            res.render 'recommended', context: { documents: todisplay }
 

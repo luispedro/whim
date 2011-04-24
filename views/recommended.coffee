@@ -3,5 +3,5 @@ p 'Found '+@documents.length+' recommendations'
 ul ->
     for doc in @documents
         li ->
-            text doc.title
+            text "#{doc.doc.title} (#{doc.hits} hits)"
 
