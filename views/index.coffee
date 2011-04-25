@@ -25,3 +25,13 @@ div id: 'content', ->
         a href: "/user", ->
             text "I understand, let me try it out."
     
+    p ->
+        a id: 'add-to-mailing-list-button', href: '#', ->
+            text "Let me know when it's ready."
+
+    coffeescript ->
+        ($ '#add-to-mailing-list-button').click ->
+            ($ '#add-to-mailing-list').show()
+
+    div id: 'add-to-mailing-list', style: 'display: none', ->
+        text "Add to mailing list"
