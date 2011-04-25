@@ -1,10 +1,11 @@
-private = require('./mendeley_private')
 OAuth = require('oauth').OAuth
+
+
 oa = new OAuth(
             'http://api.mendeley.com/oauth/request_token/',
             'http://api.mendeley.com/oauth/access_token/',
-            private.key,
-            private.secret,
+            process.env.MENDELEY_KEY,
+            process.env.MENDELEY_SECRET,
             '1.0',
             'oob',
             "PLAINTEXT")
