@@ -7,4 +7,8 @@ html ->
         script src: 'http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'
     body ->
         div id: 'container', ->
-            @body
+            div ->
+                @body
+            div id: 'footer', ->
+                p ->
+                    text 'Copyright 2011 by <a href="http://luispedro.org">Luis Pedro Coelho</a>.'
