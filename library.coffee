@@ -44,7 +44,8 @@ retrieve_doi_information = (doi, title, cb) ->
             cb null, doc
 
 retrieve_library_mendeley = (req, cb) ->
-    oauth.get_protected 'oapi/library/?items=100', \
+    nr_items = 1000 unless process.env.NODE_ENV == 'development'
+    oauth.get_protected "oapi/library/?items=#{nr_items}", \
                         req.session.oauth.access_token, \
                         req.session.oauth.access_token_secret, \
                         (error, data, response) ->
