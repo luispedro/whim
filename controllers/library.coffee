@@ -2,8 +2,8 @@ async = require('async')
 _ = require('underscore')
 sys = require('sys')
 
-oauth = require('./login')
-models = require('./models')
+oauth = require('../login')
+models = require('../models')
 
 
 retrieve_doi_information_mendeley = (doi, title, cb) ->
@@ -127,4 +127,3 @@ retrieve_library_mendeley = (req, cb) ->
             nr_uuids = _.reduce documents, counter, 0
             console.log '[retrieve library] success ('+nr_uuids+')'
             res.render 'library', context: { documents: documents, nr_uuids: nr_uuids }
-

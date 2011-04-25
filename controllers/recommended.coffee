@@ -3,7 +3,7 @@ _ = require('underscore')
 sys = require('sys')
 
 models = require('../models')
-library = require('../library')
+library = require('./library')
 related = require('../related')
 
 retrieve_recommendations = (req, cb) ->
