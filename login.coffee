@@ -1,5 +1,9 @@
 OAuth = require('oauth').OAuth
 
+if not process.env.MENDELEY_KEY?
+    console.log "No KEY"
+if not process.env.MENDELEY_SECRET?
+    console.log "No SECRET"
 
 oa = new OAuth(
             'http://api.mendeley.com/oauth/request_token/',
