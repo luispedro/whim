@@ -9,6 +9,7 @@ models = require('./models')
 related = require('./related').related
 handle_library = require('./library').handle_library
 handle_recommended = require('./controllers/recommended').handle_recommended
+user_controller = require './controllers/users'
 
 app = express.createServer()
 app.configure ->
@@ -24,22 +25,15 @@ app.configure ->
     app.use app.router
     app.use express.static(__dirname + '/public')
 
+app.configure 'development', ->
+    app.use express.errorHandler({ dumpExceptions: true, showStack: true })
+
 app.get '/', (req, res) ->
     res.redirect '/user'
 
-app.get '/user', (req, res) ->
-    res.render 'userlogin'
 
-app.get '/mendeleyauth', (req, res) ->
-    req.session.username = req.query.mendeleyusername
-
-    oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
-        if error
-            console.log 'oauth request_token error: ' + sys.inspect(error)
-            res.render 'error', context: { error_message: ('Error '+error.statusCode+' in retrieving auth token.') }
-        else
-            req.session.oauth = { token : oauth_token, token_secret : oauth_token_secret }
-            res.redirect 'http://api.mendeley.com/oauth/authorize/?oauth_token=' + oauth_token + '&oauth_callback=http:%2F%2F127.0.0.1:20008%2Fuserlogin%2F'
+app.get '/user', user_controller.user
+app.get '/mendeleyauth', user_controller.mendeleyauth
 
 app.get '/userlogin/', (req, res) ->
     verifier = req.query.oauth_verifier
