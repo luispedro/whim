@@ -2,6 +2,7 @@ async
 connect-redis
 coffeekup
 express
+express-namespace
 mongoose
 oauth
 openid

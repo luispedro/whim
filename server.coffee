@@ -3,11 +3,12 @@ sys = require('sys')
 redis_store = require('connect-redis')
 _ = require('underscore')
 stylus = require 'stylus'
+require 'express-namespace'
 
 oauth = require('./login')
 models = require('./models')
 related = require('./related').related
-handle_library = require('./controllers/library').handle_library
+library = require('./controllers/library')
 handle_recommended = require('./controllers/recommended').handle_recommended
 user_controller = require './controllers/users'
 simple = require('./controllers/simple').simple
@@ -50,9 +51,10 @@ app.get '/userlogin/', (req, res) ->
         else
             req.session.oauth.access_token = oauth_access_token
             req.session.oauth.access_token_secret = oauth_access_token_secret
-            res.redirect '/library'
+            res.redirect '/library/show-delayed'
 
-app.get '/library', handle_library
+library.register_urls app
+
 app.get '/related', related
 app.get '/recommended', handle_recommended
 

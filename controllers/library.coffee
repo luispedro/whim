@@ -4,7 +4,7 @@ sys = require('sys')
 
 oauth = require('../login')
 models = require('../models')
-
+simple = require('./simple').simple
 
 retrieve_doi_information_mendeley = (doi, title, cb) ->
     url = 'oapi/documents/details/' + doi.replace('/', '%252F') + '?type=doi'
@@ -110,7 +110,7 @@ retrieve_library_mendeley = (req, cb) ->
         else
             retrieve_library_mendeley req, cb
 
-@handle_library = (req, res) ->
+show = (req, res) ->
     if not req.session.oauth
         res.redirect '/user'
         return
@@ -127,3 +127,17 @@ retrieve_library_mendeley = (req, cb) ->
             nr_uuids = _.reduce documents, counter, 0
             console.log '[retrieve library] success ('+nr_uuids+')'
             res.render 'library', context: { documents: documents, nr_uuids: nr_uuids }
+
+ready = (req, res) ->
+    if req.session.library_ready
+        res.write '{ available: true }'
+    else
+        res.write '{ available: false }'
+
+show_delayed = simple 'library_delayed'
+
+@register_urls = (app) ->
+    app.namespace '/library', ->
+        app.get '/ready', ready
+        app.get '/show', show
+        app.get '/show-delayed', show_delayed
