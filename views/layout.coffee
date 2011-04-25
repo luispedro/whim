@@ -5,4 +5,5 @@ html ->
         title "Scientific Whim: What Have I Missed"
         link rel: 'stylesheet', href: '/stylesheets/style.css'
     body ->
-        @body
+        div id: 'container', ->
+            @body
