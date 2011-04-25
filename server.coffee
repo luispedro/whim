@@ -60,6 +60,6 @@ app.get '/library', handle_library
 app.get '/related', related
 app.get '/recommended', handle_recommended
 
-app.listen 80
+app.listen process.env.PORT
 console.log 'WTR server started on port %s', app.address().port
 
