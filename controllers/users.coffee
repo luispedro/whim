@@ -1,9 +1,37 @@
 sys = require 'sys'
+openid = require 'openid'
 
 oauth = require '../login'
 
+extensions = [new openid.SimpleRegistration(
+                    nickname: true
+                    email: true
+                    )]
+rparty = new openid.RelyingParty 'http://127.0.0.1:20008/verify', null, false, false, extensions
+
+
+@authenticate = (req, res) ->
+    if not req.query.openid_id?
+        res.redirect '/user'
+        return
+    openid_id = req.query.openid_id
+    rparty.authenticate openid_id, false, (authurl) ->
+        if not authurl
+            res.render 'error'
+        else
+            req.session.username = openid_id
+            res.redirect authurl
+@verify = (req, res) ->
+    rparty.verifyAssertion req, (result) ->
+        if result.authenticated
+            req.session.email = result.email
+            req.session.nickname = result.nickname
+            res.redirect '/mendeleyauth'
+        else
+            console.log '[openid.verify error]'
+            res.render 'error'
+
 @mendeleyauth = (req, res) ->
-    req.session.username = req.query.mendeleyusername
 
     oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
         if error

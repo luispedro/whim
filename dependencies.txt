@@ -4,5 +4,6 @@ coffeekup
 express
 mongoose
 oauth
+openid
 stylus
 underscore

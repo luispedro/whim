@@ -33,6 +33,8 @@ app.get '/', simple 'index'
 app.get '/about', simple 'about'
 
 app.get '/user', user_controller.user
+app.get '/authenticate', user_controller.authenticate
+app.get '/verify', user_controller.verify
 app.get '/mendeleyauth', user_controller.mendeleyauth
 
 app.get '/userlogin/', (req, res) ->
