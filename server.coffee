@@ -10,6 +10,7 @@ related = require('./related').related
 handle_library = require('./library').handle_library
 handle_recommended = require('./controllers/recommended').handle_recommended
 user_controller = require './controllers/users'
+simple = require('./controllers/simple').simple
 
 app = express.createServer()
 app.configure ->
@@ -28,9 +29,8 @@ app.configure ->
 app.configure 'development', ->
     app.use express.errorHandler({ dumpExceptions: true, showStack: true })
 
-app.get '/', (req, res) ->
-    res.redirect '/user'
-
+app.get '/', simple 'index'
+app.get '/about', simple 'about'
 
 app.get '/user', user_controller.user
 app.get '/mendeleyauth', user_controller.mendeleyauth
