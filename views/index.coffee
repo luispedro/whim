@@ -24,4 +24,9 @@ div id: 'content', ->
             ($ '#add-to-mailing-list').show()
 
     div id: 'add-to-mailing-list', style: 'display: none', ->
-        text "Add to mailing list"
+        p   "Eventually a signup box will appear here."
+        p   """"
+            For now, you can email the author at <a
+            href='mailto:luis@luispedro.org'>luis@luispedro.org</a> telling him
+            you want to be added to the mailing list.
+            """
