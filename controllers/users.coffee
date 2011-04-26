@@ -7,7 +7,10 @@ extensions = [new openid.SimpleRegistration(
                     nickname: true
                     email: true
                     )]
-rparty = new openid.RelyingParty 'http://127.0.0.1:20008/verify', null, false, false, extensions
+host = 'http://whim.no.de'
+if process.env.NODE_ENV == 'development'
+    host = 'http://127.0.0.1:20008'
+rparty = new openid.RelyingParty "#{host}/verify", null, false, false, extensions
 
 
 @authenticate = (req, res) ->
