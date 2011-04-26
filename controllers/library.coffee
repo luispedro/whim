@@ -130,11 +130,20 @@ show = (req, res) ->
 
 ready = (req, res) ->
     if req.session.library_ready
-        res.write '{ available: true }'
+        res.write '{ "available" : true }'
     else
-        res.write '{ available: false }'
+        res.write '{ "available" : false }'
+    res.end()
 
-show_delayed = simple 'library_delayed'
+show_delayed = (req, res) ->
+    session = req.session
+    res.render 'library_delayed'
+    session.library_ready = false
+    exports.retrieve_library req, ->
+        session.library_ready = true
+        console.log "[library ready]"
+        session.save()
+
 
 @register_urls = (app) ->
     app.namespace '/library', ->
