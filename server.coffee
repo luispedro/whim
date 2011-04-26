@@ -9,7 +9,7 @@ oauth = require('./login')
 models = require('./models')
 related = require('./related').related
 library = require('./controllers/library')
-handle_recommended = require('./controllers/recommended').handle_recommended
+recommended = require('./controllers/recommended')
 user_controller = require './controllers/users'
 simple = require('./controllers/simple').simple
 
@@ -54,9 +54,9 @@ app.get '/userlogin/', (req, res) ->
             res.redirect '/library/show-delayed'
 
 library.register_urls app
+recommended.register_urls app
 
 app.get '/related', related
-app.get '/recommended', handle_recommended
 
 app.listen process.env.PORT
 console.log 'WTR server started on port %s', app.address().port

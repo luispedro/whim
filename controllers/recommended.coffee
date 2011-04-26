@@ -20,7 +20,7 @@ retrieve_recommendations = (req, cb) ->
             else
                 cb null, _.flatten related
 
-@handle_recommended = (req, res) ->
+show = (req, res) ->
     retrieve_recommendations req, (err, documents) ->
         if err
             console.log '[retrieve recommendations] error: '+sys.inspect(err)
@@ -40,3 +40,24 @@ retrieve_recommendations = (req, cb) ->
                 d1.hits - d0.hits
             res.render 'recommended', context: { documents: todisplay }
 
+ready = (req, res) ->
+    if req.session.recommended_ready
+        res.write '{ "available" : true }'
+    else
+        res.write '{ "available" : false }'
+    res.end()
+
+show_delayed = (req, res) ->
+    session = req.session
+    res.render 'recommended_delayed'
+    session.recommended_ready  = false
+    retrieve_recommendations req, ->
+        session.recommended_ready = true
+        session.save()
+
+
+@register_urls = (app) ->
+    app.namespace '/recommended', ->
+        app.get '/ready', ready
+        app.get '/show', show
+        app.get '/show-delayed', show_delayed
