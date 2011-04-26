@@ -5,6 +5,7 @@ html ->
         title "Scientific Whim: What Have I Missed"
         link rel: 'stylesheet', href: '/stylesheets/style.css'
         script src: 'http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'
+        script src: 'http://widget.uservoice.com/J9Ceur8DmPRWdJZ60grwUA.js'
     body ->
         div id: 'container', ->
             div id: 'header', ->
