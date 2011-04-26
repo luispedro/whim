@@ -6,5 +6,5 @@ div id: 'content', ->
         p ->
             label 'Your OpenID: ', for: 'openid_id'
             input type: 'text', id: 'openid_id', name: 'openid_id'
-        input type: 'submit'
+            input type: 'submit', value: 'Login'
 
