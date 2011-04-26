@@ -1,13 +1,3 @@
-div id: 'header', ->
-    h1 'Scientific: What Have I Missed'
-    
-    div id: 'buttons', ->
-        a href: '/', -> text "Home"
-        a href: '/library', -> text "My Library"
-        a href: '/recommended', -> text "Recommended"
-        a href: '/about', -> text "About"
-        a href: '/logout', -> text "Logout"
-
 div id: 'content', ->
     p   """
         Scientific whim (for <em>what have I missed</em>) is a simple app that
