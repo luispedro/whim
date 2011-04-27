@@ -137,7 +137,7 @@ ready = (req, res) ->
 
 show_delayed = (req, res) ->
     session = req.session
-    res.render 'library_delayed'
+    res.render 'library/delayed'
     session.library_ready = false
     exports.retrieve_library req, ->
         session.library_ready = true
