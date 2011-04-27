@@ -13,6 +13,7 @@ library = require('./controllers/library')
 recommended = require('./controllers/recommended')
 user = require './controllers/users'
 stats = require './controllers/stats'
+waiting_list = require './controllers/waiting-list'
 simple = require('./controllers/simple').simple
 
 app = express.createServer()
@@ -44,6 +45,7 @@ library.register_urls app
 recommended.register_urls app
 user.register_urls app
 stats.register_urls app
+waiting_list.register_urls app
 
 app.get '/related', related
 
