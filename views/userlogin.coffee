@@ -1,6 +1,6 @@
 div id: 'content', ->
     h2 'Login Below'
-    form action: "/authenticate", method: 'get', ->
+    form action: "/user/openid_authenticate", method: 'get', ->
         p ->
             label 'Your OpenID: ', for: 'openid_id'
             input type: 'text', id: 'openid_id', name: 'openid_id'

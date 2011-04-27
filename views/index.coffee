@@ -12,7 +12,7 @@ div id: 'content', ->
         strong "Whim is in ALPHA version. There will be bugs."
 
     p ->
-        a href: "/user", ->
+        a href: "/user/login", ->
             text "I understand, let me try it out."
     
     p ->
