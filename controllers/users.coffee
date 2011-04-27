@@ -2,6 +2,7 @@ sys = require 'sys'
 openid = require 'openid'
 
 oauth = require '../login'
+models = require '../models'
 
 extensions = [new openid.SimpleRegistration(
                     nickname: true
@@ -24,26 +25,45 @@ openid_authenticate = (req, res) ->
         if not authurl
             res.render 'error'
         else
-            req.session.username = openid_id
+            req.session.openid_id = openid_id
             res.redirect authurl
 
 openid_verify = (req, res) ->
     openid_rparty.verifyAssertion req, (result) ->
         if result.authenticated
-            req.session.email = result.email
-            req.session.nickname = result.nickname
-            oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
-                if error
-                    console.log 'oauth request_token error: ' + sys.inspect(error)
-                    res.render 'error', context: { error_message: ('Error '+error.statusCode+' in retrieving auth token.') }
+            models.User.findOne { login: "openid:#{req.session.openid_id}" }, (err, user) ->
+                if err
+                    res.render 'error', error: err
                 else
-                    req.session.oauth = { token : oauth_token, token_secret : oauth_token_secret }
-                    callback = "http://#{req.header('Host')}/user/finish"
-                    callback = encodeURIComponent(callback)
-                    res.redirect "#{oauth.base_url}oauth/authorize/?oauth_token=#{oauth_token}&oauth_callback=#{callback}"
+                    if not user?
+                        user = new models.User
+                        user.visits = 1
+                        user.first_visit = new Date
+                        user.login = ["openid:#{req.session.openid_id}"]
+                    req.session.user = user
+                    if result.email
+                        user.email = result.email
+                    if result.nickname
+                        user.displayname = result.nickname
+                    ++user.visits
+                    user.last_access = new Date()
+                    user.save (err) ->
+                        if err
+                            console.log "[user saving error] #{sys.inspect err}"
+                            res.render 'error', error: err
+                        else
+                            oauth.request_token (error, oauth_token, oauth_token_secret, results) ->
+                                if error
+                                    console.log 'oauth request_token error: ' + sys.inspect(error)
+                                    res.render 'error', context: { error_message: ('Error '+error.statusCode+' in retrieving auth token.') }
+                                else
+                                    req.session.oauth = { token : oauth_token, token_secret : oauth_token_secret }
+                                    callback = "http://#{req.header('Host')}/user/finish"
+                                    callback = encodeURIComponent(callback)
+                                    res.redirect "#{oauth.base_url}oauth/authorize/?oauth_token=#{oauth_token}&oauth_callback=#{callback}"
         else
             console.log '[openid.verify error]'
-            res.render 'error'
+            res.render 'error', error: sys.inspect(result)
 
 
 finish = (req, res) ->

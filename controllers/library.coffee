@@ -51,7 +51,7 @@ retrieve_library_mendeley = (req, cb) ->
                         (error, data, response) ->
         libdata = JSON.parse(data)
         library = new models.Library()
-        library.username = req.session.username
+        library.user = req.session.user._id
 
         id_to_doc = (id, cb) ->
             url = 'oapi/library/documents/' + id + '/'
@@ -93,7 +93,7 @@ retrieve_library_mendeley = (req, cb) ->
                                 console.log "Error in mongoose (saving library): "+err
 
 @retrieve_library = (req, cb) ->
-    models.Library.findOne { username: req.session.username }, (err, library) ->
+    models.Library.findOne { user: req.session.user._id }, (err, library) ->
         if err
             cb err, null
         else if library?

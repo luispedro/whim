@@ -11,14 +11,31 @@ Document = new Schema(
             , response : Number
             })
 
-Library = new Schema(
-            { username : String
-            , documents : [ObjectId]
-            })
+Library = new Schema
+            user: ObjectId
+            documents : [ObjectId]
+
 Related = new Schema(
             { base : { type: String, index: true }
             , related : [String]
             })
+
+User = new Schema
+            login: { type: [String], index: true }
+            visits: Number
+            first_visit: Date
+            last_visit: Date
+            email: String
+            displayname: String
+
+WaitingList = new Schema
+            name: String
+            email: String
+
+register = (name, schema) ->
+    mongoose.model(name, schema)
+    mongoose.model(name)
+
 mongoose.model('Document', Document)
 @Document = mongoose.model('Document')
 
@@ -27,5 +44,8 @@ mongoose.model('Library', Library)
 
 mongoose.model('Related', Related)
 @Related = mongoose.model('Related')
+
+@User = register('User', User)
+@WaitingList = register('WaitingList', WaitingList)
 
 
