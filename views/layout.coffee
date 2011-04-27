@@ -20,7 +20,7 @@ html ->
     body ->
         div id: 'container', ->
             div id: 'header', ->
-                h1 'Scientific: What Have I Missed'
+                h1 'Scientific Whim: What Have I Missed'
                 div id: 'buttons', ->
                     a href: '/', -> text "Home"
                     if @user?
