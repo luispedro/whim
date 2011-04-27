@@ -4,6 +4,7 @@ html ->
         meta charset: 'utf-8'
         title "Scientific Whim: What Have I Missed"
         link rel: 'stylesheet', href: '/stylesheets/style.css'
+        link rel: 'stylesheet', href: '/thirdparty/css/openid.css'
         script src: 'http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'
         script src: 'http://widget.uservoice.com/J9Ceur8DmPRWdJZ60grwUA.js', async: 'true'
         coffeescript ->

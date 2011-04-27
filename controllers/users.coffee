@@ -14,7 +14,7 @@ if process.env.NODE_ENV == 'development'
 openid_rparty = new openid.RelyingParty "#{host}/user/openid_verify", null, false, false, extensions
 
 login = (req, res) ->
-    res.render 'userlogin'
+    res.render 'user/login'
 
 openid_authenticate = (req, res) ->
     if not req.query.openid_id?
