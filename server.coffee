@@ -4,6 +4,7 @@ redis_store = require('connect-redis')
 _ = require('underscore')
 stylus = require 'stylus'
 require 'express-namespace'
+csrf = require 'express-csrf'
 
 oauth = require('./login')
 models = require('./models')
@@ -20,12 +21,16 @@ app.configure ->
     app.use express.cookieParser()
     app.use express.session { secret: 'the mouse ran up the clock', store: new redis_store() }
 
-    app.register '.coffee', require('coffeekup')
+    app.register '.coffee', require('./lib/coffeekup-adaptor')
     app.set 'view engine', 'coffee'
 
     app.use stylus.middleware({ src: __dirname + '/public' })
     app.use app.router
     app.use express.static(__dirname + '/public')
+
+    app.dynamicHelpers
+        csrf: csrf.token
+    app.use csrf.check()
 
 app.configure 'development', ->
     app.use express.errorHandler({ dumpExceptions: true, showStack: true })

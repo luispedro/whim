@@ -24,9 +24,15 @@ div id: 'content', ->
             ($ '#add-to-mailing-list').show()
 
     div id: 'add-to-mailing-list', style: 'display: none', ->
-        p   "Eventually a signup box will appear here."
-        p   """"
-            For now, you can email the author at <a
-            href='mailto:luis@luispedro.org'>luis@luispedro.org</a> telling him
-            you want to be added to the mailing list.
-            """
+        p   '''
+            Leave your name and email on the form below and you will get an
+            email when the site is ready for prime time.
+            '''
+        form id: 'mailing-list', action: 'add-to-mailing-list', method: 'post',
+            input type: 'hidden', name: 'csrf', value: @csrf
+            p ->
+                label for: 'name', 'Your name: '
+                input type: 'text', name: 'name', id: 'name'
+                label for: 'email', 'Your email: '
+                input type: 'text', name: 'email', id: 'email'
+                input type: 'submit', value: 'Submit'
