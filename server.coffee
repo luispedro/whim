@@ -12,6 +12,7 @@ related = require('./related').related
 library = require('./controllers/library')
 recommended = require('./controllers/recommended')
 user = require './controllers/users'
+stats = require './controllers/stats'
 simple = require('./controllers/simple').simple
 
 app = express.createServer()
@@ -41,6 +42,7 @@ app.get '/about', simple 'about'
 library.register_urls app
 recommended.register_urls app
 user.register_urls app
+stats.register_urls app
 
 app.get '/related', related
 
