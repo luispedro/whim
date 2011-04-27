@@ -23,10 +23,14 @@ html ->
                 h1 'Scientific: What Have I Missed'
                 div id: 'buttons', ->
                     a href: '/', -> text "Home"
-                    a href: '/library/show-delayed', -> text "My Library"
-                    a href: '/recommended/show-delayed', -> text "Recommended"
+                    if @user?
+                        a href: '/library/show-delayed', -> text "My Library"
+                        a href: '/recommended/show-delayed', -> text "Recommended"
+                    else
+                        a href: '/user/login', -> text "Login"
                     a href: '/about', -> text "About"
-                    a href: '/user/logout', -> text "Logout"
+                    if @user?
+                        a href: '/user/logout', -> text "Logout"
             div ->
                 @body
             div id: 'footer', ->

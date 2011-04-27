@@ -31,6 +31,7 @@ app.configure ->
 
     app.dynamicHelpers
         csrf: csrf.token
+        user: (req, res) -> req.session.user
     app.use csrf.check()
 
 app.configure 'development', ->
