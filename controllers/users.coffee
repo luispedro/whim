@@ -81,10 +81,16 @@ finish = (req, res) ->
             req.session.oauth.access_token_secret = oauth_access_token_secret
             res.redirect '/library/show-delayed'
 
+logout = (req, res) ->
+    delete req.session.user
+    delete req.session.openid_id
+    res.render 'user/logout'
+
 @register_urls = (app) ->
     app.namespace '/user', ->
         app.get 'login', login
         app.get 'finish', finish
         app.get 'openid_authenticate', openid_authenticate
         app.get 'openid_verify', openid_verify
+        app.get 'logout', logout
 

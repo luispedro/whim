@@ -25,7 +25,7 @@ html ->
                     a href: '/library/show-delayed', -> text "My Library"
                     a href: '/recommended/show-delayed', -> text "Recommended"
                     a href: '/about', -> text "About"
-                    a href: '/logout', -> text "Logout"
+                    a href: '/user/logout', -> text "Logout"
             div ->
                 @body
             div id: 'footer', ->
