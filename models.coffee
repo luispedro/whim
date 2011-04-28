@@ -3,13 +3,14 @@ mongoose.connect 'mongodb://localhost/whim'
 Schema = mongoose.Schema
 ObjectId = Schema.ObjectId
 
-Document = new Schema(
-            { doi : { type: String, index: true }
-            , title : String
-            , uuid : { type: String, index: true }
-            , queried_at : Date
-            , response : Number
-            })
+Document = new Schema
+            title: String
+            authors: String
+            doi: { type: String, index: true }
+            uuid: { type: String, index: true }
+            mendeley_url: { type: String, index: true }
+            queried_at: Date
+            response: Number
 
 Library = new Schema
             user: ObjectId

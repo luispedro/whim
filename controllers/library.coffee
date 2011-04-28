@@ -1,14 +1,15 @@
 async = require('async')
 _ = require('underscore')
 sys = require('sys')
+http = require 'http'
+url = require 'url'
 
 oauth = require('../login')
 models = require('../models')
 simple = require('./simple').simple
 
-retrieve_doi_information_mendeley = (doi, title, cb) ->
-    url = 'oapi/documents/details/' + doi.replace('/', '%252F') + '?type=doi'
-    oauth.get_protected url, \
+retrieve_doi_information_mendeley = (doi, doc, cb) ->
+    oauth.get_protected "oapi/documents/details/#{doi.replace('/', '%252F')}?type=doi",
             null, \
             null, \
             (error, data, response) ->
@@ -21,27 +22,58 @@ retrieve_doi_information_mendeley = (doi, title, cb) ->
                 else
                     response = 200
                     docdata = JSON.parse(data)
-                    title = docdata.title
+                    doc.title = docdata.title
                     uuid = docdata.uuid
-                doc = new models.Document(
-                                { doi: doi
-                                , title: title
-                                , uuid: uuid
-                                , queried_at: new Date()
-                                , response: response
-                                })
+                doc = new models.Document
+                                title: doc.title
+                                authors: doc.authors
+                                doi: doi
+                                uuid: uuid
+                                mendeley_url: doc.mendeley_url
+                                queried_at: new Date()
+                                response: response
                 cb null, doc
 
-retrieve_doi_information = (doi, title, cb) ->
-    models.Document.findOne { doi: doi }, (err, doc) ->
+retrieve_doi_information = (doi, doc, cb) ->
+    models.Document.findOne { doi: doi }, (err, saved) ->
         if err
             console.log "[doi lookup] mongo error: "+err
-        if err or doc is null
+        if err or saved is null
             console.log "[doi lookup] will query mendeley"
-            retrieve_doi_information_mendeley doi, title, cb
+            retrieve_doi_information_mendeley doi, doc, cb
         else
             console.log "[doi lookup] found it in mongodb"
-            cb null, doc
+            cb null, saved
+
+retrieve_doc_from_url = (mendeley_url, doc, cb) ->
+    models.Document.findOne { mendeley_url: mendeley_url }, (err, saved) ->
+        if err
+            console.log "[url lookup] mongo error: "+err
+            cb err, null
+        if saved is null
+            console.log "[url lookup] will query mendeley"
+            parsed = url.parse mendeley_url
+            get_options =
+                host: parsed.host
+                port: 80
+                path: parsed.pathname
+            req = http.get get_options, (res) ->
+                # Parse HTML with regex:
+                doi_regex = /<meta name="citation_doi" content="([^"]*)" \/>/
+                match = doi_regex.exec res.data
+                if match and match[1]
+                    retrieve_doi_information match[1], doc, cb
+                    console.log "[url lookup] succeeded for #{mendeley_url}"
+                else
+                    console.log "[url lookup] failed for #{mendeley_url}"
+                    cb null, new models.Document
+                                title: doc.title
+                                authors: doc.authors
+                                mendeley_url: doc.mendeley_url
+                                queried_at: new Date()
+        else
+            console.log "[url lookup] found it in mongodb"
+            cb null, saved
 
 retrieve_library_mendeley = (req, cb) ->
     nr_items = 1000 unless process.env.NODE_ENV == 'development'
@@ -54,8 +86,7 @@ retrieve_library_mendeley = (req, cb) ->
         library.user = req.session.user._id
 
         id_to_doc = (id, cb) ->
-            url = 'oapi/library/documents/' + id + '/'
-            oauth.get_protected url, \
+            oauth.get_protected "oapi/library/documents/#{id}/", \
                                 req.session.oauth.access_token, \
                                 req.session.oauth.access_token_secret, \
                                 (error, data, response) ->
@@ -65,9 +96,14 @@ retrieve_library_mendeley = (req, cb) ->
                 else
                     details = JSON.parse(data)
                     if details.identifiers.doi?
-                        retrieve_doi_information details.identifiers.doi, details.title, cb
+                        retrieve_doi_information details.identifiers.doi, details, cb
+                    else if details.mendeley_url?
+                        retrieve_doc_from_url details.mendeley_url, details, cb
                     else
-                        cb null, new models.Document({ title: details.title, doi: null, uuid: null })
+                        cb null, new models.Document
+                                title: details.title
+                                authors: details.authors
+                                mendeley_url: details.mendeley_url
         async.map libdata.document_ids, id_to_doc, (err, docs) ->
             if err
                 cb err, null
