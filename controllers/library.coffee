@@ -8,27 +8,32 @@ oauth = require('../login')
 models = require('../models')
 simple = require('./simple').simple
 
-retrieve_doi_information_mendeley = (doi, doc, cb) ->
-    oauth.get_protected "oapi/documents/details/#{doi.replace('/', '%252F')}?type=doi",
+mendeley_doc_from_doi = (doi, doc, cb) ->
+    exports.mendeley_doc "#{doi.replace('/', '%252F')}?type=doi", doc, cb
+
+@mendeley_doc = (identifier, doc, cb) ->
+    console.log "[mendeley doc]: #{identifier}"
+    oauth.get_protected "oapi/documents/details/#{identifier}",
             null, \
             null, \
             (error, data, response) ->
                 if error
                     response = error.statusCode
                     uuid = null
-                    if not (response == 404 or response == 403)
+                    if not (response == 404 or response == 403 or response)
                         cb error, null
                         return
                 else
                     response = 200
                     docdata = JSON.parse(data)
                     doc.title = docdata.title
-                    uuid = docdata.uuid
+                    doc.uuid = docdata.uuid
+                    doc.doi = docdata.doi
                 doc = new models.Document
                                 title: doc.title
                                 authors: doc.authors
-                                doi: doi
-                                uuid: uuid
+                                doi: doc.doi
+                                uuid: doc.uuid
                                 mendeley_url: doc.mendeley_url
                                 queried_at: new Date()
                                 response: response
@@ -40,7 +45,7 @@ retrieve_doi_information = (doi, doc, cb) ->
             console.log "[doi lookup] mongo error: "+err
         if err or saved is null
             console.log "[doi lookup] will query mendeley"
-            retrieve_doi_information_mendeley doi, doc, cb
+            mendeley_doc_from_doi doi, doc, cb
         else
             console.log "[doi lookup] found it in mongodb"
             cb null, saved
@@ -57,20 +62,37 @@ retrieve_doc_from_url = (mendeley_url, doc, cb) ->
                 host: parsed.host
                 port: 80
                 path: parsed.pathname
-            req = http.get get_options, (res) ->
-                # Parse HTML with regex:
-                doi_regex = /<meta name="citation_doi" content="([^"]*)" \/>/
-                match = doi_regex.exec res.data
-                if match and match[1]
-                    retrieve_doi_information match[1], doc, cb
-                    console.log "[url lookup] succeeded for #{mendeley_url}"
-                else
-                    console.log "[url lookup] failed for #{mendeley_url}"
-                    cb null, new models.Document
-                                title: doc.title
-                                authors: doc.authors
-                                mendeley_url: doc.mendeley_url
-                                queried_at: new Date()
+            http.get get_options, (res) ->
+                done = false
+                matched_doi = null
+                res.on 'data', (data) ->
+                    if not done
+                        # Parse HTML with regex:
+                        id_regex = /"id":"([-0-9a-f]{36})"/
+                        doi_regex = /<meta name="citation_doi" content="([^"]*)" \/>/
+
+                        id_match = id_regex.exec data
+                        doi_match = doi_regex.exec data
+
+                        if id_match and id_match[1]
+                            exports.mendeley_doc (id_match[1]+'/'), doc, cb
+                            console.log "[url lookup] UUID succeeded for #{mendeley_url}"
+                            done = true
+                        else if doi_match and doi_match[1]
+                            matched_doi = match[1]
+                            matched_doi = matched_doi.replace('http://dx.doi.org/','')
+                res.on 'end', ->
+                    if not done
+                        if doi_match?
+                            retrieve_doi_information match[1], doc, cb
+                            console.log "[url lookup] DOI succeeded for #{mendeley_url}"
+                        else
+                            console.log "[url lookup] failed for #{mendeley_url}"
+                            cb null, new models.Document
+                                    title: doc.title
+                                    authors: doc.authors
+                                    mendeley_url: doc.mendeley_url
+                                    queried_at: new Date()
         else
             console.log "[url lookup] found it in mongodb"
             cb null, saved
