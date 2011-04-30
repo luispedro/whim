@@ -1,4 +1,3 @@
-h1 'Error'
+h2 'Error'
 p 'Some error happened'
-p @error_message
 p @error
