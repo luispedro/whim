@@ -18,13 +18,17 @@ retrieve_recommendations = (req, cb) ->
             if err
                 cb err, null
             else
-                cb null, _.flatten related
+                uuids = _.map documents, (doc) -> doc.uuid
+                related = _.flatten related
+                _.each related, (doc) ->
+                    doc.present = (doc.uuid in uuids)
+                cb null, related
 
 show = (req, res) ->
     retrieve_recommendations req, (err, documents) ->
         if err
             console.log '[retrieve recommendations] error: '+sys.inspect(err)
-            res.render 'error', context: { error: sys.inspect(err) }
+            res.render 'error', error: sys.inspect(err)
         else
             console.log '[retrieve recommendations] success ('+documents.length+' documents)'
             todisplay = {}
