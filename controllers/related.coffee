@@ -46,9 +46,15 @@ models = require('../models')
                                 console.log "[error saving related documents]: "+sys.inspect(err)
 
         else
-            console.log "[related] lookup on mongodb (result: "+docs.base+" -> "+docs.related.length+")"
+            console.log "[related] lookup on mongodb (result: #{docs.base} -> #{docs.related.length})"
             lookup_doc = (uuid, cb) -> models.Document.findOne { uuid: uuid }, cb
-            async.map docs.related, lookup_doc, cb
+            async.map docs.related, lookup_doc, (err, docs) ->
+                if err
+                    cb err, null
+                else
+                    _.each docs, (doc) ->
+                        doc.present = (doc._id in library.documents)
+                    cb err, docs
 
 @retrieve_related = (doc, cb) ->
     if doc.uuid?
@@ -66,6 +72,8 @@ related = (req, res) ->
     models.Document.findOne { uuid: uuid}, (error, doc) ->
         if error
             res.render 'error', error: error
+        else if doc is null
+            res.render 'error', error: "I don't know anything about this document."
         else
             exports.retrieve_related_by_uuid uuid, (error, related) ->
                 if error
