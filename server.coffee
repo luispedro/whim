@@ -8,7 +8,7 @@ csrf = require 'express-csrf'
 
 oauth = require('./login')
 models = require('./models')
-related = require('./controllers/related').related
+related = require('./controllers/related')
 library = require('./controllers/library')
 recommended = require('./controllers/recommended')
 user = require './controllers/users'
@@ -46,8 +46,7 @@ recommended.register_urls app
 user.register_urls app
 stats.register_urls app
 waiting_list.register_urls app
-
-app.get '/related', related
+related.register_urls app
 
 app.listen process.env.PORT
 console.log 'WTR server started on port %s', app.address().port

@@ -56,7 +56,7 @@ models = require('./models')
     else
         cb 'related.retrieve_related: uuid is needed', null
 
-@related = (req, res) ->
+related = (req, res) ->
     uuid = req.query.uuid
     if not uuid?
         res.render 'error', context: { msg : 'missing argument' }
@@ -64,4 +64,7 @@ models = require('./models')
     console.log "will retrieve uuid"
     exports.retrieve_related_by_uuid uuid, (error, related) ->
         res.render 'related', context: { title: "My title", related: related }
+
+@register_urls = (app) ->
+    app.get '/related', related
 
