@@ -170,7 +170,7 @@ retrieve_library_mendeley = (req, cb) ->
 
 show = (req, res) ->
     if not req.session.oauth
-        res.redirect '/user'
+        res.redirect '/user/login'
         return
     exports.retrieve_library req, (err, documents) ->
         if err
