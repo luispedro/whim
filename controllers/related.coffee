@@ -2,8 +2,8 @@ _ = require('underscore')
 async = require('async')
 sys = require('sys')
 
-oauth = require('./login')
-models = require('./models')
+oauth = require('../login')
+models = require('../models')
 
 @retrieve_related_by_uuid = (uuid, cb) ->
     console.log "[related] will query mongodb"
@@ -62,8 +62,16 @@ related = (req, res) ->
         res.render 'error', context: { msg : 'missing argument' }
         return
     console.log "will retrieve uuid"
-    exports.retrieve_related_by_uuid uuid, (error, related) ->
-        res.render 'related', context: { title: "My title", related: related }
+
+    models.Document.findOne { uuid: uuid}, (error, doc) ->
+        if error
+            res.render 'error', error: error
+        else
+            exports.retrieve_related_by_uuid uuid, (error, related) ->
+                if error
+                    res.render 'error', error: error
+                else
+                    res.render 'related', context: { title: doc.title, related: related }
 
 @register_urls = (app) ->
     app.get '/related', related
