@@ -25,7 +25,6 @@ openid_authenticate = (req, res) ->
         if not authurl
             res.render 'error'
         else
-            req.session.openid_id = openid_id
             res.redirect authurl
 
 openid_verify = (req, res) ->
@@ -39,7 +38,7 @@ openid_verify = (req, res) ->
                         user = new models.User
                         user.visits = 1
                         user.first_visit = new Date
-                        user.login = ["openid:#{req.session.openid_id}"]
+                        user.login = ["openid:#{result.claimedIdentifier}"]
                     req.session.user = user
                     if result.email
                         user.email = result.email
