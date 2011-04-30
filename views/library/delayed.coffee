@@ -9,7 +9,7 @@ p ->
     text '''In the future, there will be some fancy animation here. For now,
     just boring text.'''
 
-p class: 'hidden5000', style: 'display: none' ->
+p class: 'hidden5000', style: 'display: none', ->
     text 'You will be redirected when it is done. If it takes too long, '
     a href: '/library/show', -> text 'continue'
     text '.'
