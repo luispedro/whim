@@ -79,12 +79,12 @@ retrieve_doc_from_url = (mendeley_url, doc, cb) ->
                             console.log "[url lookup] UUID succeeded for #{mendeley_url}"
                             done = true
                         else if doi_match and doi_match[1]
-                            matched_doi = match[1]
+                            matched_doi = doi_match[1]
                             matched_doi = matched_doi.replace('http://dx.doi.org/','')
                 res.on 'end', ->
                     if not done
-                        if doi_match?
-                            retrieve_doi_information match[1], doc, cb
+                        if matched_doi?
+                            retrieve_doi_information matched_doi, doc, cb
                             console.log "[url lookup] DOI succeeded for #{mendeley_url}"
                         else
                             console.log "[url lookup] failed for #{mendeley_url}"
