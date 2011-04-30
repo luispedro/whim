@@ -8,7 +8,7 @@ csrf = require 'express-csrf'
 
 oauth = require('./login')
 models = require('./models')
-related = require('./related').related
+related = require('./controllers/related').related
 library = require('./controllers/library')
 recommended = require('./controllers/recommended')
 user = require './controllers/users'

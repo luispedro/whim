@@ -2,9 +2,9 @@ async = require('async')
 _ = require('underscore')
 sys = require('sys')
 
+related = require('./related')
 models = require('../models')
 library = require('./library')
-related = require('../related')
 
 retrieve_recommendations = (req, cb) ->
     maybe_retrieve = (doc, cb) ->
