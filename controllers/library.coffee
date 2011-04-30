@@ -155,7 +155,7 @@ retrieve_library_mendeley = (req, cb) ->
                                 console.log "Error in mongoose (saving library): "+err
 
 @retrieve_library = (req, cb) ->
-    models.Library.findOne { user: req.session.user._id }, (err, library) ->
+    exports.retrieve_local_library req, (err, library) ->
         if err
             cb err, null
         else if library?
@@ -171,6 +171,9 @@ retrieve_library_mendeley = (req, cb) ->
             async.map library.documents, objectid_to_doc, cb
         else
             retrieve_library_mendeley req, cb
+
+@retrieve_local_library = (req, cb) ->
+    models.Library.findOne { user: req.session.user._id }, cb
 
 show = (req, res) ->
     if not req.session.oauth
