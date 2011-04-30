@@ -103,6 +103,10 @@ retrieve_library_mendeley = (req, cb) ->
                         req.session.oauth.access_token, \
                         req.session.oauth.access_token_secret, \
                         (error, data, response) ->
+        if error
+            cb error, null
+            return
+
         libdata = JSON.parse(data)
         library = new models.Library()
         library.user = req.session.user._id
