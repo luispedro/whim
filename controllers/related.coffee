@@ -2,6 +2,7 @@ _ = require('underscore')
 async = require('async')
 sys = require('sys')
 
+library = require './library'
 oauth = require('../login')
 models = require('../models')
 
@@ -63,23 +64,24 @@ related = (req, res) ->
         return
     console.log "will retrieve uuid"
 
-    async.parallel {
-        library: cb -> library.retrieve_local_library req, cb
-        document: cb -> models.Document.findOne { uuid: uuid }, cb
-        }, (error, results) ->
+    show_related = (error, results) ->
+        if error
+            res.render 'error', error: error
+            return
+        if results.document is null
+            res.render 'error', error: "I don't know anything about this document."
+            return
+        exports.retrieve_related_by_uuid uuid, (error, related) ->
             if error
                 res.render 'error', error: error
-                return
-            if results.document is null
-                res.render 'error', error: "I don't know anything about this document."
-                return
-            exports.retrieve_related_by_uuid uuid, (error, related) ->
-                if error
-                    res.render 'error', error: error
-                else
-                    _.each related, (doc) ->
-                        doc.present = (doc._id in results.library.documents)
-                    res.render 'related', context: { title: results.document.title, related: related }
+            else
+                _.each related, (doc) ->
+                    doc.present = (doc._id in results.library.documents)
+                res.render 'related', context: { title: results.document.title, related: related }
+    async.parallel {
+        library: (cb) -> library.retrieve_local_library req, cb
+        document: (cb) -> models.Document.findOne { uuid: uuid }, cb
+        }, show_related
 
 @register_urls = (app) ->
     app.get '/related', related
