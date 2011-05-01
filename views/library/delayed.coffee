@@ -26,7 +26,7 @@ coffeescript ->
                     window.setTimeout check_ready, 1000
             error: (err) ->
                 alert "error in AJAX"
-    show_hidden = =>
+    show_hidden = ->
         $('.hidden5000').fadeIn()
     window.setTimeout check_ready, 1000
     window.setTimeout show_hidden, 5000
