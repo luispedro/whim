@@ -8,7 +8,7 @@ ul ->
             if doc.present
                 text " (already in your library)."
             else
-                a href: "/library/add?uuid=#{doc.uuid}", ->
+                a href: "/library/add?uuid=#{doc.doc.uuid}", ->
                     strong ' Add To your library'
                 text '.'
 
