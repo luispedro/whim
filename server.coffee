@@ -6,7 +6,7 @@ stylus = require 'stylus'
 require 'express-namespace'
 csrf = require 'express-csrf'
 
-oauth = require('./login')
+oauth = require './mendeley'
 models = require('./models')
 related = require('./controllers/related')
 library = require('./controllers/library')

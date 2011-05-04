@@ -3,7 +3,7 @@ async = require('async')
 sys = require('sys')
 
 library = require './library'
-oauth = require('../login')
+oauth = require '../mendeley'
 models = require('../models')
 
 @retrieve_related_by_uuid = (uuid, cb) ->

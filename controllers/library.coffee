@@ -4,7 +4,7 @@ sys = require('sys')
 http = require 'http'
 url = require 'url'
 
-oauth = require('../login')
+oauth = require '../mendeley'
 models = require('../models')
 simple = require('./simple').simple
 

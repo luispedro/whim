@@ -1,7 +1,7 @@
 sys = require 'sys'
 openid = require 'openid'
 
-oauth = require '../login'
+oauth = require '../mendeley'
 models = require '../models'
 
 extensions = [new openid.SimpleRegistration(
