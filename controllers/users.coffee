@@ -30,13 +30,13 @@ openid_authenticate = (req, res) ->
 openid_verify = (req, res) ->
     openid_rparty.verifyAssertion req, (result) ->
         if result.authenticated
-            models.User.findOne { login: "openid:#{req.session.openid_id}" }, (err, user) ->
+            models.User.findOne { login: "openid:#{result.claimedIdentifier}" }, (err, user) ->
                 if err
                     res.render 'error', error: err
                 else
                     if not user?
                         user = new models.User
-                        user.visits = 1
+                        user.visits = 0
                         user.first_visit = new Date
                         user.login = ["openid:#{result.claimedIdentifier}"]
                     req.session.user = user
