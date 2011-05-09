@@ -2,6 +2,8 @@ h2 'Related Papers'
 p ->
     text "Base: "
     cite @title
+p ->
+    text "Found #{@related.length} related papers:"
 ul ->
     for r in @related
         li ->

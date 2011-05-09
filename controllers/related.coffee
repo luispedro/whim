@@ -77,7 +77,7 @@ related = (req, res) ->
             else
                 _.each related, (doc) ->
                     doc.present = (doc._id in results.library.documents)
-                res.render 'related', context: { title: results.document.title, related: related }
+                res.render 'related', title: results.document.title, related: related
     async.parallel {
         library: (cb) -> library.retrieve_local_library req, cb
         document: (cb) -> models.Document.findOne { uuid: uuid }, cb
