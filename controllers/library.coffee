@@ -209,9 +209,17 @@ show_delayed = (req, res) ->
         console.log "[library ready]"
         session.save()
 
+refresh = (req, res) ->
+    models.Library.remove { user: req.session.user._id }, (err) ->
+        if err
+            res.render 'error', error: err
+        else
+            res.redirect '/library/show-delayed'
+
 
 @register_urls = (app) ->
     app.namespace '/library', ->
         app.get '/ready', ready
         app.get '/show', show
         app.get '/show-delayed', show_delayed
+        app.get '/refresh', refresh
