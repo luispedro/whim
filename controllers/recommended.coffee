@@ -21,7 +21,11 @@ retrieve_recommendations = (req, cb) ->
                 uuids = _.map documents, (doc) -> doc.uuid
                 related = _.flatten related
                 _.each related, (doc) ->
-                    doc.present = (doc.uuid in uuids)
+                    # We cannot do ``doc._id in documents`` because that
+                    # comparison uses === which is false!
+                    # String(x) == String(y) is the regular JS ==
+                    doc.present = _.any uuids, (u) ->
+                        String(doc.uuid) == String(u)
                 cb null, related
 
 show = (req, res) ->
