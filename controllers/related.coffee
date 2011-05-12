@@ -83,7 +83,11 @@ related = (req, res) ->
                 res.render 'error', error: error
             else
                 _.each related, (doc) ->
-                    doc.present = (doc._id in results.library.documents)
+                    # We cannot do ``doc._id in documents`` because that
+                    # comparison uses === which is false!
+                    # String(x) == String(y) is the regular JS ==
+                    doc.present = _.any results.library.documents, (doc2) ->
+                        String(doc._id) == String(doc2)
                 res.render 'related', title: results.document.title, related: related
     async.parallel {
         library: (cb) -> library.retrieve_local_library req, cb
