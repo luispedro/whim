@@ -22,7 +22,6 @@ models = require('../models')
                     else
                         details = JSON.parse(data)
                         console.log "[related] retrieved from mendeley"
-                        cb null, details.documents
                         related = new models.Related()
                         related.base = uuid
                         related.related = []
@@ -41,11 +40,19 @@ models = require('../models')
                                                     , uuid: document.uuid
                                                     , queried_at: new Date()
                                                     })
-                                    doc.save cb
-                        async.forEach details.documents, save_doc, (err) ->
+                                    doc.save (err) ->
+                                        if err
+                                            cb err, null
+                                        else
+                                            cb null, doc
+                                else
+                                    cb null, doc
+                        async.map details.documents, save_doc, (err, docs) ->
                             if err
                                 console.log "[error saving related documents]: "+sys.inspect(err)
-
+                                cb err, null
+                            else
+                                cb null, docs
         else
             console.log "[related] lookup on mongodb (result: #{docs.base} -> #{docs.related.length})"
             lookup_doc = (uuid, cb) -> models.Document.findOne { uuid: uuid }, cb
