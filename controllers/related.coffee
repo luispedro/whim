@@ -34,12 +34,12 @@ models = require('../models')
                                 if err
                                     cb err
                                 else if not doc?
-                                    doc = new models.Document(
-                                                    { doi: document.doi
-                                                    , title: document.title
-                                                    , uuid: document.uuid
-                                                    , queried_at: new Date()
-                                                    })
+                                    doc = new models.Document
+                                                    doi: document.doi
+                                                    title: document.title
+                                                    authors: document.authors
+                                                    uuid: document.uuid
+                                                    queried_at: new Date()
                                     doc.save (err) ->
                                         if err
                                             cb err, null
