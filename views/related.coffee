@@ -4,13 +4,15 @@ p ->
     cite @title
 p ->
     text "Found #{@related.length} related papers:"
-ul ->
+ul class: 'paper-list', ->
     for r in @related
         li ->
             cite r.title
+            text ' by '
+            cite r.doc.authors
             if r.present
                 text " (already in your library)"
-            else
-                a href: "/library/add?uuid=#{r.uuid}", ->
-                    strong " Add To your library"
+            a href: "/documents/details?uuid=#{r.uuid}", ->
+                text ' [Details]'
+            text '.'
 
