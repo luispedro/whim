@@ -14,6 +14,7 @@ recommended = require('./controllers/recommended')
 user = require './controllers/users'
 stats = require './controllers/stats'
 waiting_list = require './controllers/waiting-list'
+documents = require './controllers/documents'
 simple = require('./controllers/simple').simple
 
 app = express.createServer()
@@ -41,12 +42,8 @@ app.configure 'development', ->
 app.get '/', simple 'index'
 app.get '/about', simple 'about'
 
-library.register_urls app
-recommended.register_urls app
-user.register_urls app
-stats.register_urls app
-waiting_list.register_urls app
-related.register_urls app
+_.each [library, recommended, user, stats, related, documents], (mod) ->
+    mod.register_urls app
 
 app.listen process.env.PORT
 console.log 'WTR server started on port %s', app.address().port
