@@ -6,3 +6,6 @@ p ->
     strong 'Authors'
     text @doc.authors
 
+p ->
+    a href: "/documents/add?uuid=#{ @doc.uuid }", ->
+        text 'Add to your library'

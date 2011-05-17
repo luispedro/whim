@@ -85,6 +85,12 @@ logout = (req, res) ->
     delete req.session.openid_id
     res.render 'user/logout'
 
+@login_required = (handler) -> (req, res) ->
+    if not req.session.user?
+        res.render 'user/login'
+    else
+        handler req, res
+
 @register_urls = (app) ->
     app.namespace '/user', ->
         app.get 'login', login
